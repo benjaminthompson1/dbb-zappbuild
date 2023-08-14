@@ -15,4 +15,4 @@ jobs:
         run: ls -al
 
       - name: Transfer file using Ansible
-        run: ansible-playbook -i ansible/inventories/inventory.yml ansible/mainframe-transfer.yml -vvv
+        run: ansible-playbook -i .github/ansible/inventories/inventory.yml .github/ansible/mainframe-transfer.yml -vvv
