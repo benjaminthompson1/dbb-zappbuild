@@ -1,33 +1,48 @@
 ---
+# This playbook is designed to work with IBM z/OS systems.
+# It performs a series of tasks on the specified host: ben_s0w1.
 - hosts: ben_s0w1 
+
+  # Use the ibm.ibm_zos_core collection which provides modules to interact with z/OS systems.
   collections:
     - ibm.ibm_zos_core
+
+  # We set this to 'no' since we're not gathering system facts in this playbook.
   gather_facts: no
 
+  # Environment variables that may be required by some tasks.
+  # Ensure 'environment_vars' is defined in your variables (inventory, group_vars, host_vars, or as an extra variable).
   environment: "{{ environment_vars }}"
 
   tasks:
+    # This task pings the z/OS system to verify its reachability.
     - name: Ping using zos_ping
       zos_ping:
       register: zos_ping_result
 
+    # Display the response from the zos_ping to provide diagnostic information.
     - name: Response from zos_ping
       debug:
         msg: "{{ zos_ping_result }}"
 
+    # Check the version of git installed on the target system.
     - name: Check git version
       command: git --version
       register: git_version_result
 
+    # Display the git version for diagnostic purposes.
     - name: Display git version
       debug:
         msg: "{{ git_version_result.stdout }}"
 
+    # Pull the latest code from the specified Git repository.
+    # Using SSH for the pull requires the host's key to be in known_hosts (or accepting it).
+    # Also, an SSH key pair (private key specified) should be set up for authentication.
     - name: Pull latest code from repository
       git:
         repo: "git@github.com:benjaminthompson1/dbb-zappbuild.git"
         dest: "/u/ibmuser/zGit-Repositories/dbb-zappbuild"
-        version: 'HEAD'
-        accept_hostkey: yes  # Only if you're sure about accepting any hostkey, otherwise ensure the key is in known_hosts
-        key_file: "/u/ibmuser/.ssh/github_rsa"  # Optional, if you want to specify a non-default private key
-        update: yes
+        version: 'HEAD'  # Get the latest version (HEAD) from the default branch.
+        accept_hostkey: yes  # Accept the target host's key. Use with caution.
+        key_file: "/u/ibmuser/.ssh/github_rsa"  # Path to the SSH private key used for authentication.
+        update: yes  # If the repo exists, fetch updates; otherwise, clone the repo.
