@@ -22,3 +22,9 @@
     - name: Display git version
       debug:
         msg: "{{ git_version_result.stdout }}"
+
+    - name: Pull latest code from repository
+      git:
+        repo: "https://github.com/benjaminthompson1/dbb-zappbuild.git"
+        dest: "/u/ibmuser/zGit-Repositories/dbb-zappbuild"
+        update: yes
