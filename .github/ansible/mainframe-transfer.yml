@@ -25,6 +25,9 @@
 
     - name: Pull latest code from repository
       git:
-        repo: "https://github.com/benjaminthompson1/dbb-zappbuild.git"
+        repo: "git@github.com:benjaminthompson1/dbb-zappbuild.git"
         dest: "/u/ibmuser/zGit-Repositories/dbb-zappbuild"
+        version: 'HEAD'
+        accept_hostkey: yes  # Only if you're sure about accepting any hostkey, otherwise ensure the key is in known_hosts
+        key_file: "/u/ibmuser/.ssh/github_rsa"  # Optional, if you want to specify a non-default private key
         update: yes
