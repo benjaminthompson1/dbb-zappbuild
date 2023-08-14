@@ -1,0 +1,18 @@
+name: GitHub Transfer z25c
+
+on:
+  workflow_dispatch:
+
+jobs:
+  transfer-z25c:
+    runs-on: z25c
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: List current directory contents
+        run: ls -al
+
+      - name: Transfer file using Ansible
+        run: ansible-playbook -i ansible/inventories/inventory.yml ansible/mainframe-transfer.yml -vvv
