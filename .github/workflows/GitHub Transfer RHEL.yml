@@ -1,11 +1,11 @@
-name: GitHub Transfer z25c
+name: GitHub Transfer RHEL
 
 on:
   workflow_dispatch:
 
 jobs:
-  transfer-z25c:
-    runs-on: z25c
+  transfer-RHEL:
+    runs-on: RHEL
 
     steps:
       - name: Checkout repository
