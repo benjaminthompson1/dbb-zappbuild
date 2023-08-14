@@ -15,8 +15,10 @@
       debug:
         msg: "{{ zos_ping_result }}"
 
-    - name: Pull latest code from repository
-      git:
-        repo: "https://github.com/benjaminthompson1/dbb-zappbuild"
-        dest: "/u/ibmuser/zGit-Repositories/dbb-zappbuild"
-        update: yes
+    - name: Check git version
+      command: git --version
+      register: git_version_result
+
+    - name: Display git version
+      debug:
+        msg: "{{ git_version_result.stdout }}"
