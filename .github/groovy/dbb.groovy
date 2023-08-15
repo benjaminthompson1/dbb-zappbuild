@@ -38,7 +38,7 @@ compile.dd(new DDStatement().name("TASKLIB").dsn("IGY640.SIGYCOMP").options("shr
 // Setting up SYSPRINT and copying its content to an HFS file
 println("Setting up SYSPRINT...")
 compile.dd(new DDStatement().name("SYSPRINT").options("cyl space(5,5) unit(vio) new"))
-compile.copy(new CopyToHFS().ddName("SYSPRINT").file(new File("/tmp/hellw.log")))
+compile.copy(new CopyToHFS().ddName("SYSPRINT").file(new File("/tmp/hellow.log")))
 
 // Executing the compile
 println("Executing compile...")
