@@ -1,64 +1,55 @@
-// Import the necessary classes from the com.ibm.dbb.build package
+// Required classes from the com.ibm.dbb.build package are imported
 import com.ibm.dbb.build.*
 
 /**
- * The script is used for creating and managing data sets within IBM mainframe environments,
- * as well as handling COBOL source code files. 
+ * This script facilitates the creation and management of datasets in IBM mainframe environments. 
+ * It is also responsible for handling COBOL source code files, including their compilation.
  */
 
-// Define the names of the datasets that will be created
-def cobolDataset = "IBMUSER.DBB.COBOL" // The name of the COBOL dataset
-def objDataset = "IBMUSER.DBB.OBJ"     // The name of the OBJ dataset
+// Define dataset names for creation
+def cobolDataset = "IBMUSER.DBB.COBOL"  // COBOL dataset name
+def objDataset = "IBMUSER.DBB.OBJ"      // OBJ dataset name
 
-// Define common options for dataset creation. These are standard parameters for creating 
-// a Partitioned Data Set (PDS) on an IBM mainframe. The options specified include:
-// - Allocation size (cylindrical)
-// - Space requirements
-// - Logical record length (lrecl)
-// - Dataset organization (PO)
-// - Record format (F,B)
-// - Dataset type (library)
-// - Message level for system output
-def commonOptions = "cyl space(1,1) lrecl(80) dsorg(PO) recfm(F,B) dsntype(library) msg(1)"
+// Common dataset creation options
+// These parameters are typically used for creating a Partitioned Data Set (PDS) on IBM mainframes.
+def commonOptions = [
+    "cyl space(1,1)",   // Allocation size
+    "lrecl(80)",        // Logical record length
+    "dsorg(PO)",        // Dataset organization
+    "recfm(F,B)",       // Record format
+    "dsntype(library)", // Dataset type
+    "msg(1)"            // Message level for system output
+].join(' ')
 
-// Create COBOL PDS using the defined dataset name and common options
-new CreatePDS().dataset(cobolDataset).options(commonOptions).execute()
-println("Created dataset: $cobolDataset")
+// Function to create a PDS with specified name and common options
+def createPDS(name) {
+    new CreatePDS().dataset(name).options(commonOptions).execute()
+    println("Created dataset: $name")
+}
 
-// Create OBJ PDS using the defined dataset name and common options
-new CreatePDS().dataset(objDataset).options(commonOptions).execute()
-println("Created dataset: $objDataset")
+// Creating COBOL and OBJ PDS
+createPDS(cobolDataset)
+createPDS(objDataset)
 
-// Define the path to the source COBOL file which needs to be copied into the COBOL PDS
-def file = new File("/u/ibmuser/zGit-Repositories/dbb-zappbuild/samples/MortgageApplication/cobol/hellow.cbl")
+// Define path to the source COBOL file to be copied into COBOL PDS
+def sourceFile = new File("/u/ibmuser/zGit-Repositories/dbb-zappbuild/samples/MortgageApplication/cobol/hellow.cbl")
 
-// Copy the source COBOL file to the newly created COBOL PDS. 
-// The member name in the PDS where the source file will be copied to is named "HELLOW"
-def copy = new CopyToPDS()
-copy.setFile(file)             // Set the source file to be copied
-copy.setDataset(cobolDataset)  // Specify the target dataset
-copy.setMember("HELLOW")       // Set the member name within the PDS
-copy.execute()
-println("Copied $file to $cobolDataset(HELLOW)")
+// Copy source COBOL file to COBOL PDS with "HELLOW" as the member name
+new CopyToPDS(sourceFile, cobolDataset, "HELLOW").execute()
+println("Copied $sourceFile to $cobolDataset(HELLOW)")
 
-// Prepare to execute an MVS command to compile the COBOL source code using the IGYCRCTL compiler
-def compile = new MVSExec()
-compile.setPgm("IGYCRCTL")  // Set the program name for the COBOL compiler
-compile.setParm("LIB")      // Set parameter to specify the library
+// Initialize MVS command to compile the COBOL source using IGYCRCTL compiler
+def compile = new MVSExec().pgm("IGYCRCTL").parm("LIB")
 
-// Create a DD (Data Definition) statement which will be used during the compile step.
-// This DD statement defines the dataset and member that the compiler should use as its input.
-def sysin = new DDStatement()
-sysin.setName("SYSIN")                       // Name of the DD statement
-sysin.setDsn("IBMUSER.DBB.COBOL(HELLOW)")    // Dataset and member to be used
-sysin.setOptions("shr")                      // Set options for the DD statement
-compile.addDDStatement(sysin)                // Add the DD statement to the compile command
+// Add DD (Data Definition) statement for the compile step
+compile.addDDStatement(new DDStatement().name("SYSIN").dsn("IBMUSER.DBB.COBOL(HELLOW)").options("shr"))
 compile.dd(new DDStatement().name("SYSPRINT").options("cyl space(5,5) unit(vio) new"))
 compile.copy(new CopyToHFS().ddName("SYSPRINT").file(new File("/tmp/hellow.log")))
 
-def rc = compile.execute()
-
-if (rc > 4)
-    println("Compile failed!  RC=$rc")
-else
-    println("Compile successful!  RC=$rc")
+// Execute compilation and print status based on return code
+def returnCode = compile.execute()
+if (returnCode > 4) {
+    println("Compile failed! RC=$returnCode")
+} else {
+    println("Compile successful! RC=$returnCode")
+}
