@@ -1,6 +1,8 @@
 // Required classes from the com.ibm.dbb.build package are imported
 import com.ibm.dbb.build.*
 
+println("Debug: " + commonOptions)
+
 /**
  * This script facilitates the creation and management of datasets in IBM mainframe environments. 
  * It is also responsible for handling COBOL source code files, including their compilation.
