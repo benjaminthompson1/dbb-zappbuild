@@ -3,63 +3,32 @@ import com.ibm.dbb.build.*
 
 println("Initializing mainframe dataset management and COBOL compilation script...")
 
-/**
- * This script facilitates the creation and management of datasets in IBM mainframe environments. 
- * It is also responsible for handling COBOL source code files, including their compilation.
- */
+new CreatePDS().dataset("IBMUSER.DBB.COBOL").options("cyl space(1,1) lrecl(80) dsorg(PO) recfm(F,B) dsntype(library) msg(1)").execute()
+new CreatePDS().dataset("IBMUSER.DBB.OBJ").options("cyl space(1,1) lrecl(80) dsorg(PO) recfm(F,B) dsntype(library) msg(1)").execute()
 
-// Define dataset names for creation
-def cobolDataset = "IBMUSER.DBB.COBOL"  // COBOL dataset name
-def objDataset = "IBMUSER.DBB.OBJ"      // OBJ dataset name
+def file = new File("/u/ibmuser/zGit-Repositories/dbb-zappbuild/samples/MortgageApplication/cobol/hellow.cbl")
+def copy = new CopyToPDS()
+copy.setFile(file)
+copy.setDataset("IBMUSER.DBB.COBOL")
+copy.setMember("HELLOW")
+copy.execute()
 
-// Common dataset creation options
-def commonOptions = [
-    "cyl space(1,1)",   // Allocation size
-    "lrecl(80)",        // Logical record length
-    "dsorg(PO)",        // Dataset organization
-    "recfm(F,B)",       // Record format
-    "dsntype(library)", // Dataset type
-    "msg(1)"            // Message level for system output
-].join(' ')
+def compile = new MVSExec()
+compile.setPgm("IGYCRCTL")
+compile.setParm("LIB")
 
-println("Debug: " + commonOptions)
+def sysin = new DDStatement()
+sysin.setName("SYSIN")
+sysin.setDsn("IBMUSER.DBB.COBOL(HELLOW)")
+sysin.setOptions("shr")
+compile.addDDStatement(sysin)
 
-// Function to create a PDS with specified name and common options
-def createPDS(name) {
-    println("Attempting to create dataset: $name...")
-    new CreatePDS().dataset(name).options(commonOptions).execute()
-    println("Successfully created dataset: $name")
-}
-
-// Creating COBOL and OBJ PDS
-createPDS(cobolDataset)
-createPDS(objDataset)
-
-// Define path to the source COBOL file to be copied into COBOL PDS
-def sourceFile = new File("/u/ibmuser/zGit-Repositories/dbb-zappbuild/samples/MortgageApplication/cobol/hellow.cbl")
-
-println("Preparing to copy $sourceFile to $cobolDataset(HELLOW)...")
-
-// Copy source COBOL file to COBOL PDS with "HELLOW" as the member name
-new CopyToPDS(sourceFile, cobolDataset, "HELLOW").execute()
-println("Successfully copied $sourceFile to $cobolDataset(HELLOW)")
-
-// Initialize MVS command to compile the COBOL source using IGYCRCTL compiler
-println("Initializing COBOL compilation process...")
-def compile = new MVSExec().pgm("IGYCRCTL").parm("LIB")
-
-// Add DD (Data Definition) statement for the compile step
-compile.addDDStatement(new DDStatement().name("SYSIN").dsn("IBMUSER.DBB.COBOL(HELLOW)").options("shr"))
 compile.dd(new DDStatement().name("SYSPRINT").options("cyl space(5,5) unit(vio) new"))
 compile.copy(new CopyToHFS().ddName("SYSPRINT").file(new File("/tmp/hellow.log")))
 
-// Execute compilation and print status based on return code
-println("Executing COBOL compilation...")
-def returnCode = compile.execute()
-if (returnCode > 4) {
-    println("Compile failed! RC=$returnCode")
-} else {
-    println("Compile successful! RC=$returnCode")
-}
+def rc = compile.execute()
 
-println("Script execution complete.")
+if (rc > 4)
+    println("Compile failed!  RC=$rc")
+else
+    println("Compile successful!  RC=$rc")
