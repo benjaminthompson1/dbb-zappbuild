@@ -46,3 +46,12 @@
         accept_hostkey: yes  # Accept the target host's key. Use with caution.
         key_file: "/u/ibmuser/.ssh/github_rsa"  # Path to the SSH private key used for authentication.
         update: yes  # If the repo exists, fetch updates; otherwise, clone the repo.
+
+    - name: Execute Groovy script on the remote machine
+      command: 
+        cmd: /usr/lpp/IBM/dbb/bin/groovy /u/ibmuser/zGit-Repositories/dbb-zappbuild/.github/groovy/dbb.groovy
+      register: result
+
+    - name: Display result of Groovy script
+      debug:
+        msg: "{{ result.stdout }}"
