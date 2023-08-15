@@ -13,7 +13,7 @@ jobs:
   # Purpose:
   # - This job focuses on tasks related to the RHEL environment.
   # - It checks out the repository, lists directory contents for debugging purposes, and uses Ansible for file transfers.
-  transfer-RHEL:
+  DBB-COBOL-z25c:
     # Execution Environment:
     # The tasks in this job are executed on a machine or container with a RHEL operating system.
     runs-on: RHEL
