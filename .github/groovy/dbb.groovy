@@ -53,4 +53,12 @@ sysin.setName("SYSIN")                       // Name of the DD statement
 sysin.setDsn("IBMUSER.DBB.COBOL(HELLOW)")    // Dataset and member to be used
 sysin.setOptions("shr")                      // Set options for the DD statement
 compile.addDDStatement(sysin)                // Add the DD statement to the compile command
+compile.dd(new DDStatement().name("SYSPRINT").options("cyl space(5,5) unit(vio) new"))
+compile.copy(new CopyToHFS().ddName("SYSPRINT").file(new File("/tmp/hellow.log")))
 
+def rc = compile.execute()
+
+if (rc > 4)
+    println("Compile failed!  RC=$rc")
+else
+    println("Compile successful!  RC=$rc")
