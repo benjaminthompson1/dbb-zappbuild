@@ -49,7 +49,7 @@
 
     - name: Execute Groovy script on the remote machine
       command: 
-        cmd: /usr/lpp/IBM/dbb/bin/groovy /u/ibmuser/zGit-Repositories/dbb-zappbuild/.github/groovy/dbb.groovy
+        cmd: /usr/lpp/IBM/dbb/bin/groovyz /u/ibmuser/zGit-Repositories/dbb-zappbuild/.github/groovy/dbb.groovy
       register: result
 
     - name: Display result of Groovy script
