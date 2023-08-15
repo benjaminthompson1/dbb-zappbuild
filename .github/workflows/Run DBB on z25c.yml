@@ -1,0 +1,27 @@
+# This GitHub Action is named 'Run DBB on z25c'.
+name: Run DBB on z25c
+
+# This workflow is manually triggered via the GitHub Actions UI using the 'workflow_dispatch' event.
+on:
+  workflow_dispatch:
+
+jobs:
+  # This job is responsible for transferring a file to RHEL.
+  transfer-RHEL:
+    # The job runs on a RHEL runner.
+    runs-on: RHEL
+
+    steps:
+      # This step checks out the repository's code to the runner.
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      # This step lists all the files and directories in the current directory.
+      # It helps in debugging and ensuring the right files are present.
+      - name: List current directory contents
+        run: ls -al
+
+      # This step uses Ansible to transfer files and possibly run other tasks.
+      # It uses an inventory file and a playbook that are part of the repository.
+      - name: Transfer file using Ansible
+        run: ansible-playbook -i .github/ansible/inventories/inventory.yml .github/ansible/zos_git_sync_and_dbb_run.yml -vvv
