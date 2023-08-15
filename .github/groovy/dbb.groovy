@@ -35,6 +35,7 @@ compile.dd(new DDStatement().name("SYSUT16").options("cyl space(5,5) unit(vio) n
 compile.dd(new DDStatement().name("SYSUT17").options("cyl space(5,5) unit(vio) new"))
 compile.dd(new DDStatement().name("SYSMDECK").options("cyl space(5,5) unit(vio) new"))
 compile.dd(new DDStatement().name("TASKLIB").dsn("IGY640.SIGYCOMP").options("shr"))
+
 compile.dd(new DDStatement().name("SYSPRINT").options("cyl space(5,5) unit(vio)  new"))
 compile.copy(new CopyToHFS().ddName("SYSPRINT").file(new File("/tmp/hellw.log")))
 def rc = compile.execute()
