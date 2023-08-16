@@ -54,7 +54,12 @@
 #     register: result
 
     - name: Execute Groovy script on the remote machine
-      command: "/usr/lpp/IBM/dbb/bin/groovyz /u/ibmuser/zGit-Repositories/dbb-zappbuild/.github/groovy/dbb.groovy --hlq {{ hlq }}"
+      command: "/usr/lpp/IBM/dbb/bin/groovyz /u/ibmuser/zGit-Repositories/dbb-zappbuild/build.groovy \
+                      --workspace /tmp/repos \
+                      --application MortgageApplication \
+                      --outDir /tmp/out \
+                      --hlq IBMUSER.DBB \
+                      /u/ibmuser/zGit-Repositories/dbb-zappbuild/samples/MortgageApplication/cobol/hellow.cbl                             
       environment:
         JAVA_HOME: "/usr/lpp/java/J8.0_64"
       register: result
