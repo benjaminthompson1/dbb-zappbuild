@@ -1,8 +1,20 @@
 // Importing required packages
 import com.ibm.dbb.build.*
 
-def options = new Options()
-options.addOption(Option.builder().longOpt("hlq").hasArg().desc("High-Level Qualifier for datasets").build())
+def hlq
+
+args.eachWithIndex { arg, idx ->
+    if (arg == '--hlq' && args.size() > idx + 1) {
+        hlq = args[idx + 1]
+    }
+}
+
+if (!hlq) {
+    println "High-Level Qualifier (--hlq) not provided!"
+    return
+}
+
+println "High-Level Qualifier: $hlq"
 
 // Creating a new PDS for COBOL source
 println("Creating COBOL PDS...")
