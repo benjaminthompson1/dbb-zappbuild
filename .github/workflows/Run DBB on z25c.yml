@@ -33,5 +33,4 @@ jobs:
       # This step executes an Ansible playbook which is responsible for transferring files and executing other tasks.
       # The playbook and inventory file paths are specified relative to the root of the repository.
       - name: DBB complie COBOL program using Ansible
-#       run: ansible-playbook -i .github/ansible/inventories/inventory.yml .github/ansible/zos_git_sync_and_dbb_run.yml -vvv
-        run: ansible-playbook -i .github/ansible/inventories/inventory.yml .github/ansible/zos_git_sync_and_dbb_run.yml -vvv --extra-vars "hlq=IBMUSER.DBB"
+        run: ansible-playbook -i .github/ansible/inventories/inventory.yml .github/ansible/zos_git_sync_and_dbb_run.yml -vvv
