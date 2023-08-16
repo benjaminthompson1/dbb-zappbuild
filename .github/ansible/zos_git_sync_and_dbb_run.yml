@@ -1,64 +1,68 @@
 ---
-# This playbook is designed to work with IBM z/OS systems.
-# It performs a series of tasks on the specified host: ben_s0w1.
+# This playbook manages code deployment on IBM z/OS systems for host ben_s0w1.
+# It ensures the codebase is up-to-date and subsequently initiates a build process on the z/OS.
+
 - hosts: ben_s0w1 
 
-  # Use the ibm.ibm_zos_core collection which provides modules to interact with z/OS systems.
+  # Utilize modules from the IBM z/OS Core collection for tasks specific to z/OS.
   collections:
     - ibm.ibm_zos_core
 
-  # We set this to 'no' since we're not gathering system facts in this playbook.
+  # Bypass default fact gathering for performance as it's not used in this playbook.
   gather_facts: no
 
-  # Environment variables that may be required by some tasks.
-  # Ensure 'environment_vars' is defined in your variables (inventory, group_vars, host_vars, or as an extra variable).
+  vars:
+    repo_directory: "/u/ibmuser/zGit-Repositories/dbb-zappbuild"
+
+  # Set global environment variables for all tasks. Define 'environment_vars' in an external source like inventory or group_vars.
   environment: "{{ environment_vars }}"
 
   tasks:
-    # This task pings the z/OS system to verify its reachability.
+  
+    # Test connectivity to the z/OS host.
     - name: Ping using zos_ping
       zos_ping:
       register: zos_ping_result
 
-    # Display the response from the zos_ping to provide diagnostic information.
+    # Output the z/OS ping response for diagnostic purposes.
     - name: Response from zos_ping
       debug:
         msg: "{{ zos_ping_result }}"
 
-    # Check the version of git installed on the target system.
+    # Identify the version of git installed on the z/OS system.
     - name: Check git version
       command: "git --version"
       register: git_version_result
 
-    # Display the git version for diagnostic purposes.
+    # Output the detected git version for verification.
     - name: Display git version
       debug:
         msg: "{{ git_version_result.stdout }}"
 
-    # Pull the latest code from the specified Git repository.
-    # Using SSH for the pull requires the host's key to be in known_hosts (or accepting it).
-    # Also, an SSH key pair (private key specified) should be set up for authentication.
+    # Sync the specified Git repository, ensuring the latest codebase using SSH.
     - name: Pull latest code from repository
       git:
         repo: "git@github.com:benjaminthompson1/dbb-zappbuild.git"
-        dest: "/u/ibmuser/zGit-Repositories/dbb-zappbuild"
-        version: 'HEAD'  # Get the latest version (HEAD) from the default branch.
-        accept_hostkey: yes  # Accept the target host's key. Use with caution.
-        key_file: "/u/ibmuser/.ssh/github_rsa"  # Path to the SSH private key used for authentication.
-        update: yes  # If the repo exists, fetch updates; otherwise, clone the repo.
+        dest: "{{ repo_directory }}"
+        version: 'HEAD'
+        accept_hostkey: yes  # Automatically trust the SSH host key, but be cautious in production environments.
+        key_file: "/u/ibmuser/.ssh/github_rsa"
+        update: yes
 
+    # Run the Groovy build script, specifying necessary parameters for the build process.
     - name: Execute Groovy script on the remote machine
       command: >
-        /usr/lpp/IBM/dbb/bin/groovyz /u/ibmuser/zGit-Repositories/dbb-zappbuild/build.groovy
-        --workspace /u/ibmuser/zGit-Repositories/dbb-zappbuild/samples
+        /usr/lpp/IBM/dbb/bin/groovyz {{ repo_directory }}/build.groovy
+        --workspace {{ repo_directory }}/samples
         --application MortgageApplication
         --outDir /tmp/out
         --hlq IBMUSER.DBB
-        /u/ibmuser/zGit-Repositories/dbb-zappbuild/samples/MortgageApplication/cobol/hellow.cbl            
+        {{ repo_directory }}/samples/MortgageApplication/cobol/hellow.cbl            
       environment:
         JAVA_HOME: "/usr/lpp/java/J8.0_64"
       register: result
 
+    # Display output of the Groovy script for debugging and validation.
     - name: Display result of Groovy script
       debug:
         msg: "{{ result.stdout }}"
