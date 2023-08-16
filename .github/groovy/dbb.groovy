@@ -1,13 +1,16 @@
 // Importing required packages
 import com.ibm.dbb.build.*
 
+def options = new Options()
+options.addOption(Option.builder().longOpt("hlq").hasArg().desc("High-Level Qualifier for datasets").build())
+
 // Creating a new PDS for COBOL source
 println("Creating COBOL PDS...")
-new CreatePDS().dataset("IBMUSER.DBB.COBOL").options("cyl space(1,1) lrecl(80) dsorg(PO) recfm(F,B) dsntype(library) msg(1)").execute()
+new CreatePDS().dataset("${hlq}.COBOL").options("cyl space(1,1) lrecl(80) dsorg(PO) recfm(F,B) dsntype(library) msg(1)").execute()
 
 // Creating a new PDS for COBOL object code
 println("Creating OBJ PDS...")
-new CreatePDS().dataset("IBMUSER.DBB.OBJ").options("cyl space(1,1) lrecl(80) dsorg(PO) recfm(F,B) dsntype(library) msg(1)").execute()
+new CreatePDS().dataset("${hlq}.OBJ").options("cyl space(1,1) lrecl(80) dsorg(PO) recfm(F,B) dsntype(library) msg(1)").execute()
 
 // Defining the file to be copied to PDS
 def file = new File("/u/ibmuser/zGit-Repositories/dbb-zappbuild/samples/MortgageApplication/cobol/hellow.cbl")
@@ -16,7 +19,7 @@ def file = new File("/u/ibmuser/zGit-Repositories/dbb-zappbuild/samples/Mortgage
 println("Copying file to COBOL PDS...")
 def copy = new CopyToPDS()
 copy.setFile(file)
-copy.setDataset("IBMUSER.DBB.COBOL")
+copy.setDataset("${hlq}.COBOL")
 copy.setMember("HELLOW")
 copy.execute()
 
@@ -25,8 +28,8 @@ println("Setting up compile parameters...")
 def compile = new MVSExec()
 compile.setPgm("IGYCRCTL")
 compile.setParm("LIB")
-compile.dd(new DDStatement().name("SYSIN").dsn("IBMUSER.DBB.COBOL(HELLOW)").options("shr"))
-compile.dd(new DDStatement().name("SYSLIN").dsn("IBMUSER.DBB.OBJ(HELLOW)").options("shr"))
+compile.dd(new DDStatement().name("SYSIN").dsn("${hlq}.COBOL(HELLOW)").options("shr"))
+compile.dd(new DDStatement().name("SYSLIN").dsn("${hlq}.OBJ(HELLOW)").options("shr"))
 
 // Defining utility datasets for the compile
 (1..17).each { num ->
