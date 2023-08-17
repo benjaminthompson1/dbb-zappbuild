@@ -50,6 +50,23 @@
         update: yes
 
     # Run the Groovy build script, specifying necessary parameters for the build process.
+#    - name: Execute Groovy script on the remote machine
+#      command: >
+#        /usr/lpp/IBM/dbb/bin/groovyz {{ repo_directory }}/build.groovy
+#        --workspace {{ repo_directory }}/samples
+#        --application MortgageApplication
+#        --outDir /tmp/out
+#        --hlq IBMUSER.DBB
+#        {{ repo_directory }}/samples/MortgageApplication/cobol/hellow.cbl            
+#      environment:
+#        JAVA_HOME: "/usr/lpp/java/J8.0_64"
+#      register: result
+
+    # Display output of the Groovy script for debugging and validation.
+#    - name: Display result of Groovy script
+#      debug:
+#        msg: "{{ result.stdout }}"
+
     - name: Execute Groovy script on the remote machine
       command: >
         /usr/lpp/IBM/dbb/bin/groovyz {{ repo_directory }}/build.groovy
@@ -57,7 +74,7 @@
         --application MortgageApplication
         --outDir /tmp/out
         --hlq IBMUSER.DBB
-        {{ repo_directory }}/samples/MortgageApplication/cobol/hellow.cbl            
+        --fullBuild         
       environment:
         JAVA_HOME: "/usr/lpp/java/J8.0_64"
       register: result
@@ -66,3 +83,4 @@
     - name: Display result of Groovy script
       debug:
         msg: "{{ result.stdout }}"
+
