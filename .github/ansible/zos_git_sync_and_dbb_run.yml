@@ -55,7 +55,7 @@
 #        /usr/lpp/IBM/dbb/bin/groovyz {{ repo_directory }}/build.groovy
 #        --workspace {{ repo_directory }}/samples
 #        --application MortgageApplication
-#        --outDir /tmp/out
+#        --outDir /tmp/dbb
 #        --hlq IBMUSER.DBB
 #        {{ repo_directory }}/samples/MortgageApplication/cobol/hellow.cbl            
 #      environment:
@@ -72,7 +72,7 @@
         /usr/lpp/IBM/dbb/bin/groovyz {{ repo_directory }}/build.groovy
         --workspace {{ repo_directory }}/samples
         --application MortgageApplication
-        --outDir /tmp/out
+        --outDir /tmp/dbb
         --hlq IBMUSER.DBB
         --fullBuild         
       environment:
