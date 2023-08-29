@@ -44,8 +44,8 @@
                                    EPSPDATA-QUOTED-INTEREST-RATE.
            MOVE CALLED-PROGRAM-NAME(1)  TO WS-CALLED-PROGRAM.
            MOVE SPACES                  TO EPSPDATA-RETURN-ERROR.
-           CALL 'EPSMPMT' USING EPSPDATA.
-      *     CALL WS-CALLED-PROGRAM USING EPSPDATA.
+      *     CALL 'EPSMPMT' USING EPSPDATA.
+           CALL WS-CALLED-PROGRAM USING EPSPDATA.
            MOVE EPSPDATA-RETURN-MONTH-PAYMENT
                                         TO
                                         EPSPCOM-RETURN-MONTH-PAYMENT.
